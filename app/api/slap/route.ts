@@ -1,5 +1,8 @@
 import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import { NextResponse } from 'next/server';
+import { auth } from "@clerk/nextjs/server";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 
 const apiKey = process.env.GEMINI_API_KEY;
 
@@ -44,8 +47,28 @@ const model = genAI.getGenerativeModel({
     },
 });
 
+// Create a new ratelimiter, that allows 5 requests per 24 hours
+const ratelimit = new Ratelimit({
+    redis: Redis.fromEnv(),
+    limiter: Ratelimit.slidingWindow(5, "1d"),
+    analytics: true,
+    prefix: "@upstash/ratelimit",
+});
+
 export async function POST(req: Request) {
     try {
+        const { userId } = await auth();
+
+        if (!userId) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const { success } = await ratelimit.limit(userId);
+
+        if (!success) {
+            return NextResponse.json({ error: 'Too Many Requests' }, { status: 429 });
+        }
+
         const { text } = await req.json();
 
         if (!text) {

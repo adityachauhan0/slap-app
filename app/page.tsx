@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { SignInButton, UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
 
 export default function Home() {
   const [input, setInput] = useState('');
@@ -29,6 +30,9 @@ export default function Home() {
       });
 
       const data = await res.json();
+      if (res.status === 429) {
+        throw new Error("You've had enough reality for today. Come back in 24 hours.");
+      }
       if (!res.ok) throw new Error(data.error || 'Something went wrong');
       setResult(data);
     } catch (err: any) {
@@ -39,7 +43,18 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-[#e6e2dd] text-[#2c3e50]">
+    <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-[#e6e2dd] text-[#2c3e50] relative">
+      <div className="absolute top-6 right-6">
+        <SignedOut>
+          <SignInButton mode="modal">
+            <button className="text-xs font-mono font-bold uppercase tracking-widest text-stone-500 hover:text-stone-900 transition-colors">Sign In</button>
+          </SignInButton>
+        </SignedOut>
+        <SignedIn>
+          <UserButton />
+        </SignedIn>
+      </div>
+
       <div className="w-full max-w-md space-y-8">
 
         {/* Header */}
