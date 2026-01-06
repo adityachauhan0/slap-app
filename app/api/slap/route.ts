@@ -49,7 +49,10 @@ const model = genAI.getGenerativeModel({
 
 // Create a new ratelimiter, that allows 5 requests per 24 hours
 const ratelimit = new Ratelimit({
-    redis: Redis.fromEnv(),
+    redis: new Redis({
+        url: process.env.UPSTASH_REDIS_REST_URL || 'https://mock-url-for-build',
+        token: process.env.UPSTASH_REDIS_REST_TOKEN || 'mock-token',
+    }),
     limiter: Ratelimit.slidingWindow(5, "1d"),
     analytics: true,
     prefix: "@upstash/ratelimit",
