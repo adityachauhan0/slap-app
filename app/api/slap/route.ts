@@ -27,7 +27,7 @@ const schema = {
         },
         philosophical_slap: {
             type: SchemaType.STRING,
-            description: "A quote from a realist philosopher like Nietzsche or Cioran.",
+            description: "A quote from a realist philosopher.",
             nullable: false,
         },
         prescription: {
