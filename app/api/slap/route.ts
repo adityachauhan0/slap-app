@@ -63,7 +63,7 @@ export async function POST(req: Request) {
         const { userId } = await auth();
 
         if (!userId) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            return NextResponse.json({ error: 'Please Sign-in Douchebag.' }, { status: 401 });
         }
 
         const { success } = await ratelimit.limit(userId);
