@@ -3,7 +3,7 @@
 import * as THREE from 'three';
 import { useRef, useMemo } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Environment, ContactShadows, Cloud, Sparkles } from '@react-three/drei';
+import { Environment, ContactShadows, Cloud, Sparkles, MeshTransmissionMaterial } from '@react-three/drei';
 
 function Particles({ count = 800 }) {
     const mesh = useRef<THREE.InstancedMesh>(null);
@@ -56,14 +56,20 @@ function Particles({ count = 800 }) {
     return (
         <instancedMesh ref={mesh} args={[undefined, undefined, count]}>
             <dodecahedronGeometry args={[0.2, 0]} />
-            <meshPhysicalMaterial
+            <MeshTransmissionMaterial
+                backside
+                samples={4}
+                thickness={0.5}
+                chromaticAberration={0.4}
+                anisotropy={0.3}
+                distortion={0.3}
+                distortionScale={0.5}
+                temporalDistortion={0.2}
+                iridescence={1}
+                iridescenceIOR={1}
+                iridescenceThicknessRange={[0, 1400]}
+                roughness={0.2}
                 color="#ffffff"
-                transmission={0.9}
-                roughness={0.1}
-                thickness={1}
-                ior={1.5}
-                chromaticAberration={0.1}
-                clearcoat={1}
             />
         </instancedMesh>
     );
@@ -73,8 +79,8 @@ function SorceryBackground() {
     return (
         <group>
             {/* Deep magical fog layers */}
-            <Cloud opacity={0.3} speed={0.2} width={20} depth={5} segments={10} texture="/cloud.png" color="#ffd1dc" position={[0, -5, -10]} />
-            <Cloud opacity={0.3} speed={0.2} width={20} depth={5} segments={10} color="#a8e6cf" position={[0, 5, -15]} />
+            <Cloud opacity={0.3} speed={0.2} segments={10} bounds={[10, 2, 2]} color="#ffd1dc" position={[0, -5, -10]} />
+            <Cloud opacity={0.3} speed={0.2} segments={10} bounds={[10, 2, 2]} color="#a8e6cf" position={[0, 5, -15]} />
 
             {/* Ambient magic particles in the distance */}
             <Sparkles count={200} scale={15} size={4} speed={0.3} opacity={0.5} color="#fff" />
